@@ -43,10 +43,10 @@ namespace web_bmstu.Controllers
             this.userConverters = userConverters;
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetAll(
             [FromQuery] UserSortState? sortState
         )
@@ -54,11 +54,11 @@ namespace web_bmstu.Controllers
             return Ok(mapper.Map<IEnumerable<UserDto>>(userService.GetAll(sortState)));
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(UserIdPasswordDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
         public IActionResult Add(UserPasswordDto userDto)
         {
@@ -93,11 +93,11 @@ namespace web_bmstu.Controllers
         //     }
         // }
 
-        // [Authorize]
+        [Authorize]
         [HttpPatch("{id}")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
         public IActionResult Patch(int id, UserPasswordDto user)
@@ -113,10 +113,10 @@ namespace web_bmstu.Controllers
             }
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
@@ -124,10 +124,10 @@ namespace web_bmstu.Controllers
             return deletedUser != null ? Ok(mapper.Map<UserDto>(deletedUser)) : NotFound();
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public IActionResult GetById(int id)
         {

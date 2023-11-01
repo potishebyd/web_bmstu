@@ -49,11 +49,11 @@ namespace web_bmstu.Controllers
             return Ok(mapper.Map<IEnumerable<ArtistDto>>(artistService.GetAll(filter, sortState)));
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(ArtistDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
         public IActionResult Add(ArtistBaseDto artistDto)
         {
@@ -68,11 +68,11 @@ namespace web_bmstu.Controllers
             }
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
         public IActionResult Put(int id, ArtistBaseDto artist)
@@ -108,10 +108,10 @@ namespace web_bmstu.Controllers
         //     }
         // }
 
-        // [Authorize]
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {

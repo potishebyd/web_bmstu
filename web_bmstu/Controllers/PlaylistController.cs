@@ -36,10 +36,10 @@ namespace web_bmstu.Controllers
             this.playlistConverters = playlistConverters;
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<PlaylistDto>), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetAll(
             [FromQuery] PlaylistSortState? sortState
         )
@@ -47,11 +47,11 @@ namespace web_bmstu.Controllers
             return Ok(mapper.Map<IEnumerable<PlaylistDto>>(playlistService.GetAll(sortState)));
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
         public IActionResult Add(PlaylistBaseDto playlistDto)
         {
@@ -86,11 +86,11 @@ namespace web_bmstu.Controllers
         //     }
         // }
 
-        // [Authorize]
+        [Authorize]
         [HttpPatch("{id}")]
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
         public IActionResult Patch(int id, PlaylistBaseDto playlist)
@@ -106,10 +106,10 @@ namespace web_bmstu.Controllers
             }
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
@@ -119,10 +119,10 @@ namespace web_bmstu.Controllers
             return deletedPlaylist != null ? Ok(mapper.Map<PlaylistDto>(deletedPlaylist)) : NotFound();
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public IActionResult GetById(int id)
         {
@@ -130,10 +130,10 @@ namespace web_bmstu.Controllers
             return playlist != null ? Ok(mapper.Map<PlaylistDto>(playlist)) : NotFound();
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpGet("{playlistId}/songs")]
         [ProducesResponseType(typeof(IEnumerable<SongDto>), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetSongsByPlaylistId(
             int playlistId,
             [FromQuery] SongFilterDto filter,
@@ -143,10 +143,10 @@ namespace web_bmstu.Controllers
             return Ok(mapper.Map<IEnumerable<SongDto>>(songService.GetSongsByPlaylistId(playlistId, filter, sortState)));
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpGet("{playlistId}/songs/{songId}")]
         [ProducesResponseType(typeof(SongPlaylistDto), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public IActionResult GetSongPlaylist(int songId, int playlistId)
         {
@@ -154,11 +154,11 @@ namespace web_bmstu.Controllers
             return songPlaylist != null ? Ok(mapper.Map<SongPlaylistDto>(songPlaylist)) : NotFound();
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPost("{playlistId}/songs")]
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
         public IActionResult AddSongToPlaylist(SongIdDto songIdDto, int playlistId)
         {
@@ -172,10 +172,10 @@ namespace web_bmstu.Controllers
             }
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpDelete("{playlistId}/songs/{songId}")]
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status201Created)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
         public IActionResult DeleteSongFromPlaylist(int songId, int playlistId)
         {
