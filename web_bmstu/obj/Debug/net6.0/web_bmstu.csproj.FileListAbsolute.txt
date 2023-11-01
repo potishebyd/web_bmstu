@@ -1,0 +1,8 @@
+C:\Users\kiril\source\repos\web_bmstu\web_bmstu\obj\Debug\net6.0\web_bmstu.csproj.AssemblyReference.cache
+C:\Users\kiril\source\repos\web_bmstu\web_bmstu\obj\Debug\net6.0\web_bmstu.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\kiril\source\repos\web_bmstu\web_bmstu\obj\Debug\net6.0\web_bmstu.AssemblyInfoInputs.cache
+C:\Users\kiril\source\repos\web_bmstu\web_bmstu\obj\Debug\net6.0\web_bmstu.AssemblyInfo.cs
+C:\Users\kiril\source\repos\web_bmstu\web_bmstu\obj\Debug\net6.0\web_bmstu.csproj.CoreCompileInputs.cache
+C:\Users\kiril\source\repos\web_bmstu\web_bmstu\obj\Debug\net6.0\web_bmstu.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\kiril\source\repos\web_bmstu\web_bmstu\obj\Debug\net6.0\web_bmstu.RazorAssemblyInfo.cache
+C:\Users\kiril\source\repos\web_bmstu\web_bmstu\obj\Debug\net6.0\web_bmstu.RazorAssemblyInfo.cs

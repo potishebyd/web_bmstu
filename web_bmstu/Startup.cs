@@ -1,0 +1,193 @@
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
+using Microsoft.Extensions.Logging;
+using AutoMapper;
+using System.Text.Json.Serialization;
+
+using Microsoft.EntityFrameworkCore;
+using web_bmstu.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using web_bmstu.Services;
+using web_bmstu.Interfaces;
+using web_bmstu.Repository;
+using web_bmstu.Utils;
+using System.Collections.Generic;
+using Microsoft.OpenApi.Models;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
+
+namespace web_bmstu
+{
+    public class Startup
+    {
+        private IConfigurationRoot _configuration;
+
+        public Startup(IWebHostEnvironment hostEnv)
+        {
+            _configuration = new ConfigurationBuilder().SetBasePath(hostEnv.ContentRootPath).AddJsonFile("dbsettings.json").Build();
+        }
+        // This method gets called by the runtime
+        public virtual void ConfigureServices(IServiceCollection services)
+        {
+            //JWT Authorization
+             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                     .AddJwtBearer(options =>
+                     {
+                         options.RequireHttpsMetadata = false;
+                         options.TokenValidationParameters = new TokenValidationParameters
+                         {
+                             // укзывает, будет ли валидироваться издатель при валидации токена
+                             ValidateIssuer = true,
+                             // строка, представляющая издателя
+                             ValidIssuer = AuthOptions.ISSUER,
+
+                             // будет ли валидироваться потребитель токена
+                             ValidateAudience = true,
+                             // установка потребителя токена
+                             ValidAudience = AuthOptions.AUDIENCE,
+                             // будет ли валидироваться время существования
+                             ValidateLifetime = true,
+
+                             // установка ключа безопасности
+                             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                             // валидация ключа безопасности
+                             ValidateIssuerSigningKey = true,
+                         };
+                     });
+            services.AddControllersWithViews();
+
+
+            // Connect to DB
+            var provider = _configuration["Database"];
+
+            services.AddDbContext<ApplicationDbContext>(
+                options => _ = provider switch
+                {
+                    "PostgreSQL" => options.UseNpgsql(
+                        _configuration.GetConnectionString("DefaultConnection")
+                        ),
+                    _ => throw new Exception($"Unsupported provider: {provider}")
+                }
+            );
+
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ISongService, SongService>();
+            services.AddTransient<IArtistService, ArtistService>();
+            services.AddTransient<IRecordingStudioService, RecordingStudioService>();
+            services.AddTransient<IPlaylistService, PlaylistService>();
+
+
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ISongRepository, SongRepository>();
+            services.AddTransient<IArtistRepository, ArtistRepository>();
+            services.AddTransient<IRecordingStudioRepository, RecordingStudioRepository>();
+            services.AddTransient<IPlaylistRepository, PlaylistRepository>();
+
+
+            // MVC
+            services.AddControllers().AddJsonOptions(o =>
+            {
+                var enumConverter = new JsonStringEnumConverter();
+                o.JsonSerializerOptions.Converters.Add(enumConverter);
+            }); // add string enum
+            services.AddEndpointsApiExplorer();
+
+            // Swagger
+            services.AddSwaggerGen();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "MusicCheck",
+                    Version = "v1",
+                    Description = "The API for the MusicCheck project"
+                });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert JWT with Bearer into field",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                 {
+                     new OpenApiSecurityScheme
+                     {
+                         Reference = new OpenApiReference
+                         {
+                             Type = ReferenceType.SecurityScheme,
+                             Id = "Bearer"
+                         }
+                     },
+                     new string[] { }
+                 }
+                });
+            });
+            // Admin Page
+            services.AddCoreAdmin();
+
+            // AutoMapper
+            services.AddAutoMapper(typeof(AutoMappingProfile));
+
+            // DTO converters
+            services.AddDtoConverters(); // self
+
+            // CORS
+            services.AddCors(options => {
+                options.AddPolicy(name: "MyPolicy",
+                    policy => {
+                        policy
+                            .WithOrigins("*")
+                            .WithHeaders("*")
+                            .WithMethods("*");
+                    });
+            });
+        }
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        {
+            if (env.IsDevelopment())
+            {
+                // app.UseSwagger();
+                // app.UseSwagger(c => {
+                //     c.RouteTemplate = "/api/v1/swagger/{documentName}/swagger.json";
+                // });
+                // app.UseSwaggerUI(c => {
+                //Notice the lack of / making it relative
+                //     c.SwaggerEndpoint("swagger/v1/swagger.json", "My API V1");
+                //This is the reverse proxy address
+                //    c.RoutePrefix = "api/v1";
+                //});
+                app.UseSwagger();
+                app.UseSwaggerUI();
+                app.UseDeveloperExceptionPage();
+            }
+
+            // Authentication
+            app.UseAuthentication();
+            app.UseRouting();
+            app.UseAuthorization();
+            // app.UseHttpsRedirection();
+
+            app.UseCors();
+
+            app.UseStaticFiles(); // стили для админки
+            app.UseCoreAdminCustomUrl("admin");
+
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllers(); // нет определенных маршрутов
+            });
+        }
+
+
+    }
+}
