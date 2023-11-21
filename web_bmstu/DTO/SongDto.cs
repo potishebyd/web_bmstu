@@ -18,7 +18,6 @@
     {
         public string Title { get; set; }
         public string AlbumTitle { get; set; }
-        public TimeSpan Duration { get; set; }
         public string Genre { get; set; }
         public string ArtistName { get; set; }
         public string RecordingStudioName { get; set; }

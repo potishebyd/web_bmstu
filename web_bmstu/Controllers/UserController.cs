@@ -47,11 +47,11 @@ namespace web_bmstu.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public IActionResult GetAll(
+        public async Task<IActionResult> GetAll(
             [FromQuery] UserSortState? sortState
         )
         {
-            return Ok(mapper.Map<IEnumerable<UserDto>>(userService.GetAll(sortState)));
+            return Ok(mapper.Map<IEnumerable<UserDto>>(userService.GetAllAsync(sortState)));
         }
 
         [Authorize]
@@ -60,11 +60,11 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Add(UserPasswordDto userDto)
+        public async Task<IActionResult> Add(UserPasswordDto userDto)
         {
             try
             {
-                var addedUser = userService.Add(mapper.Map<UserBL>(userDto));
+                var addedUser = await userService.AddAsync(mapper.Map<UserBL>(userDto));
                 return Ok(mapper.Map<UserIdPasswordDto>(addedUser));
             }
             catch (Exception ex)
@@ -100,11 +100,11 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Patch(int id, UserPasswordDto user)
+        public async Task<IActionResult> Patch(int id, UserPasswordDto user)
         {
             try
             {
-                var updatedUser = userService.Update(userConverters.convertPatch(id, user));
+                var updatedUser = await userService.UpdateAsync(userConverters.convertPatch(id, user));
                 return updatedUser != null ? Ok(mapper.Map<UserDto>(updatedUser)) : NotFound();
             }
             catch (Exception ex)
@@ -118,9 +118,9 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deletedUser = userService.Delete(id);
+            var deletedUser = await userService.DeleteAsync(id);
             return deletedUser != null ? Ok(mapper.Map<UserDto>(deletedUser)) : NotFound();
         }
 
@@ -129,9 +129,9 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var user = userService.GetByID(id);
+            var user = await userService.GetByIDAsync(id);
             return user != null ? Ok(mapper.Map<UserDto>(user)) : NotFound();
         }
 
@@ -139,16 +139,17 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(UserIdPasswordDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Register(LoginDto loginDto)
+        public async Task<IActionResult> Register(LoginDto loginDto)
         {
             var userDto = new UserPasswordDto
             {
                 Login = loginDto.Login,
                 Password = loginDto.Password,
-                Permission = "user"
+                Permission = "user",
+                Email = "user@mail.ru"
             };
 
-            return Add(userDto);
+            return await Add(userDto);
         }
 
         //[HttpPost("login")]
@@ -165,9 +166,9 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(TokenDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult Login(LoginDto loginDto)
+        public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var user = userService.Login(loginDto);
+            var user = await userService.LoginAsync(loginDto);
             if (user == null)
             {
                 return NotFound("Такого пользователя не существует");

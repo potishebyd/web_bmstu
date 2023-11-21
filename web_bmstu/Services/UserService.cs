@@ -23,6 +23,17 @@ namespace web_bmstu.Services
 
         IEnumerable<UserBL> GetByPermission(string permission);
         IEnumerable<UserBL> GetAll(UserSortState? sortState);
+
+        Task<UserBL> AddAsync(UserBL user);
+        Task<UserBL> DeleteAsync(int id);
+        Task<UserBL> UpdateAsync(UserBL user);
+
+        Task<UserBL> GetByIDAsync(int id);
+        Task<UserBL> GetByLoginAsync(string login);
+        Task<UserBL> LoginAsync(LoginDto loginDto);
+
+        Task<IEnumerable<UserBL>> GetByPermissionAsync(string permission);
+        Task<IEnumerable<UserBL>> GetAllAsync(UserSortState? sortState);
     }
 
     public class UserService : IUserService
@@ -46,11 +57,24 @@ namespace web_bmstu.Services
 
         }
 
+        public async Task<UserBL> AddAsync(UserBL user)
+        {
+            if (IsExist(user))
+                throw new Exception("Пользователь с таким логином уже существует");
+
+            return _mapper.Map<UserBL>(await _userRepository.AddAsync(_mapper.Map<User>(user)));
+
+        }
+
         public UserBL Delete(int id)
         {
             return _mapper.Map<UserBL>(_userRepository.Delete(id));
         }
 
+        public async Task<UserBL> DeleteAsync(int id)
+        {
+            return _mapper.Map<UserBL>(await _userRepository.DeleteAsync(id));
+        }
         public UserBL Update(UserBL user)
         {
             if (IsNotExist(user.Id))
@@ -62,20 +86,52 @@ namespace web_bmstu.Services
             return _mapper.Map<UserBL>(_userRepository.Update(_mapper.Map<User>(user)));
         }
 
+        public async Task<UserBL> UpdateAsync(UserBL user)
+        {
+            if (IsNotExist(user.Id))
+                return null;
+
+            // if (IsExist(user))
+            //     throw new Exception("Пользователь с таким логином уже существует");
+
+            return _mapper.Map<UserBL>(await _userRepository.UpdateAsync(_mapper.Map<User>(user)));
+        }
+
 
         public UserBL GetByID(int id)
         {
             return _mapper.Map<UserBL>(_userRepository.GetByID(id));
         }
 
+        public async Task<UserBL> GetByIDAsync(int id)
+        {
+            return _mapper.Map<UserBL>(await _userRepository.GetByIDAsync(id));
+        }
         public UserBL GetByLogin(string login)
         {
             return _mapper.Map<UserBL>(_userRepository.GetByLogin(login));
         }
 
+        public async Task<UserBL> GetByLoginAsync(string login)
+        {
+            return _mapper.Map<UserBL>(await _userRepository.GetByLoginAsync(login));
+        }
         public UserBL Login(LoginDto loginDto)
         {
             UserBL user = GetByLogin(loginDto.Login);
+
+            if (user == null)
+                return null;
+
+            if (user.Password == loginDto.Password)
+                return user;
+            else
+                return null;
+        }
+
+        public async Task<UserBL> LoginAsync(LoginDto loginDto)
+        {
+            UserBL user = await GetByLoginAsync(loginDto.Login);
 
             if (user == null)
                 return null;
@@ -91,6 +147,12 @@ namespace web_bmstu.Services
             return _mapper.Map<IEnumerable<UserBL>>(_userRepository.GetByPermission(permission));
         }
 
+
+        public async Task<IEnumerable<UserBL>> GetByPermissionAsync(string permission)
+        {
+            return _mapper.Map<IEnumerable<UserBL>>(await _userRepository.GetByPermissionAsync(permission));
+        }
+
         public IEnumerable<UserBL> GetAll(UserSortState? sortState)
         {
             var users = _mapper.Map<IEnumerable<UserBL>>(_userRepository.GetAll());
@@ -103,6 +165,17 @@ namespace web_bmstu.Services
             return users;
         }
 
+        public async Task<IEnumerable<UserBL>> GetAllAsync(UserSortState? sortState)
+        {
+            var users = _mapper.Map<IEnumerable<UserBL>>(await _userRepository.GetAllAsync());
+
+            if (sortState != null)
+                users = SortUsersByOption(users, sortState.Value);
+            else
+                users = SortUsersByOption(users, UserSortState.IdAsc);
+
+            return users;
+        }
 
         private IEnumerable<UserBL> SortUsersByOption(IEnumerable<UserBL> users, UserSortState sortOrder)
         {

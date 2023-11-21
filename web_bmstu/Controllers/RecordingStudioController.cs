@@ -37,16 +37,46 @@ namespace web_bmstu.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        //[HttpGet]
+        //[ProducesResponseType(typeof(IEnumerable<RecordingStudio>), StatusCodes.Status200OK)]
+        //public IActionResult GetAll(
+        //    [FromQuery] RecordingStudioFilterDto filter,
+        //    [FromQuery] RecordingStudioSortState? sortState
+        //)
+        //{
+        //    _logger.LogInformation("RecordingStudios (Request: GET)");
+        //    return Ok(mapper.Map<IEnumerable<RecordingStudioDto>>(recordingStudioService.GetAll(filter, sortState)));
+        //}
+
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<RecordingStudio>), StatusCodes.Status200OK)]
-        public IActionResult GetAll(
+        public async Task<IActionResult> GetAll(
             [FromQuery] RecordingStudioFilterDto filter,
             [FromQuery] RecordingStudioSortState? sortState
-        )
+)
         {
             _logger.LogInformation("RecordingStudios (Request: GET)");
-            return Ok(mapper.Map<IEnumerable<RecordingStudioDto>>(recordingStudioService.GetAll(filter, sortState)));
+            return Ok(mapper.Map<IEnumerable<RecordingStudioDto>>(await recordingStudioService.GetAllAsync(filter, sortState)));
         }
+
+        //[Authorize]
+        //[HttpPost]
+        //[ProducesResponseType(typeof(RecordingStudioDto), StatusCodes.Status201Created)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
+        //public IActionResult Add(RecordingStudioBaseDto recordingStudioDto)
+        //{
+        //    try
+        //    {
+        //        var addedRecordingStudio = recordingStudioService.Add(mapper.Map<RecordingStudioBL>(recordingStudioDto));
+        //        return Ok(mapper.Map<RecordingStudioDto>(addedRecordingStudio));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Conflict(ex.Message);
+        //    }
+        //}
 
         [Authorize]
         [HttpPost]
@@ -54,11 +84,11 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Add(RecordingStudioBaseDto recordingStudioDto)
+        public async Task<IActionResult> Add(RecordingStudioBaseDto recordingStudioDto)
         {
             try
             {
-                var addedRecordingStudio = recordingStudioService.Add(mapper.Map<RecordingStudioBL>(recordingStudioDto));
+                var addedRecordingStudio = await recordingStudioService.AddAsync(mapper.Map<RecordingStudioBL>(recordingStudioDto));
                 return Ok(mapper.Map<RecordingStudioDto>(addedRecordingStudio));
             }
             catch (Exception ex)
@@ -67,6 +97,27 @@ namespace web_bmstu.Controllers
             }
         }
 
+        //[Authorize]
+        //[HttpPut("{id}")]
+        //[ProducesResponseType(typeof(RecordingStudioDto), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
+        //public IActionResult Put(int id, RecordingStudioBaseDto recordingStudio)
+        //{
+        //    try
+        //    {
+        //        var updatedRecordingStudio = recordingStudioService.Update(mapper.Map<RecordingStudioBL>(recordingStudio,
+        //                o => o.AfterMap((src, dest) => dest.Id = id)));
+
+        //        return updatedRecordingStudio != null ? Ok(mapper.Map<RecordingStudioDto>(updatedRecordingStudio)) : NotFound();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Conflict(ex.Message);
+        //    }
+        //}
         [Authorize]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(RecordingStudioDto), StatusCodes.Status200OK)]
@@ -74,11 +125,11 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Put(int id, RecordingStudioBaseDto recordingStudio)
+        public async Task<IActionResult> Put(int id, RecordingStudioBaseDto recordingStudio)
         {
             try
             {
-                var updatedRecordingStudio = recordingStudioService.Update(mapper.Map<RecordingStudioBL>(recordingStudio,
+                var updatedRecordingStudio = await recordingStudioService.UpdateAsync(mapper.Map<RecordingStudioBL>(recordingStudio,
                         o => o.AfterMap((src, dest) => dest.Id = id)));
 
                 return updatedRecordingStudio != null ? Ok(mapper.Map<RecordingStudioDto>(updatedRecordingStudio)) : NotFound();
@@ -89,41 +140,42 @@ namespace web_bmstu.Controllers
             }
         }
 
-        // [HttpPatch("{id}")]
-        // [ProducesResponseType(typeof(RecordingStudioDto), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        // [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        // public IActionResult Patch(int id, RecordingStudioBaseDto recordingStudio)
-        // {
-        //     try
-        //     {
-        //         var updatedRecordingStudio = recordingStudioService.Update(recordingStudioConverters.convertPatch(id, recordingStudio));
-        //         return updatedRecordingStudio != null ? Ok(mapper.Map<RecordingStudioDto>(updatedRecordingStudio)) : NotFound();
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return Conflict(ex.Message);
-        //     }
-        // }
 
+        //[Authorize]
+        //[HttpDelete("{id}")]
+        //[ProducesResponseType(typeof(RecordingStudioDto), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        //public IActionResult Delete(int id)
+        //{
+        //    var deletedRecordingStudio = recordingStudioService.Delete(id);
+        //    return deletedRecordingStudio != null ? Ok(mapper.Map<RecordingStudioDto>(deletedRecordingStudio)) : NotFound();
+        //}
         [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(RecordingStudioDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deletedRecordingStudio = recordingStudioService.Delete(id);
+            var deletedRecordingStudio = await recordingStudioService.DeleteAsync(id);
             return deletedRecordingStudio != null ? Ok(mapper.Map<RecordingStudioDto>(deletedRecordingStudio)) : NotFound();
         }
 
+        //[HttpGet("{id}")]
+        //[ProducesResponseType(typeof(RecordingStudioDto), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        //public IActionResult GetById(int id)
+        //{
+        //    var recordingStudio = recordingStudioService.GetByID(id);
+        //    return recordingStudio != null ? Ok(mapper.Map<RecordingStudioDto>(recordingStudio)) : NotFound();
+        //}
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(RecordingStudioDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var recordingStudio = recordingStudioService.GetByID(id);
+            var recordingStudio = await recordingStudioService.GetByIDAsync(id);
             return recordingStudio != null ? Ok(mapper.Map<RecordingStudioDto>(recordingStudio)) : NotFound();
         }
     }

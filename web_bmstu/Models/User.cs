@@ -20,6 +20,9 @@ namespace web_bmstu.Models
         [Required]
         public string Permission { get; set; }
 
+        [Required]
+        public string Email { get; set; }
+
         // Другие свойства пользователя
     }
 }

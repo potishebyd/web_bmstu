@@ -8,5 +8,6 @@ namespace web_bmstu.ModelsBL
         public string Login { get; set; }
         public string Password { get; set; }
         public string Permission { get; set; }
+        public string Email { get; set; }
     }
 }

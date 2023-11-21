@@ -39,12 +39,12 @@ namespace db_cp.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<SongDto>), StatusCodes.Status200OK)]
-        public IActionResult GetAll(
+        public async Task<IActionResult> GetAll(
             [FromQuery] SongFilterDto filter,
             [FromQuery] SongSortState? sortState
         )
         {
-            return Ok(mapper.Map<IEnumerable<SongDto>>(songService.GetAll(filter, sortState)));
+            return Ok(mapper.Map<IEnumerable<SongDto>>(await songService.GetAllAsync(filter, sortState)));
         }
 
         [Authorize]
@@ -53,11 +53,11 @@ namespace db_cp.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Add(SongBaseDto songDto)
+        public async Task<IActionResult> Add(SongBaseDto songDto)
         {
             try
             {
-                var addedSong = songService.Add(mapper.Map<SongBL>(songDto));
+                var addedSong = await songService.AddAsync(mapper.Map<SongBL>(songDto));
                 return Ok(mapper.Map<SongDto>(addedSong));
             }
             catch (Exception ex)
@@ -73,11 +73,11 @@ namespace db_cp.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Put(int id, SongBaseDto song)
+        public async Task<IActionResult> Put(int id, SongBaseDto song)
         {
             try
             {
-                var updatedSong = songService.Update(mapper.Map<SongBL>(song,
+                var updatedSong = await songService.UpdateAsync(mapper.Map<SongBL>(song,
                         o => o.AfterMap((src, dest) => dest.Id = id)));
 
                 return updatedSong != null ? Ok(mapper.Map<SongDto>(updatedSong)) : NotFound();
@@ -106,14 +106,16 @@ namespace db_cp.Controllers
         //     }
         // }
 
+
+        //ДОБАВВВВИИИИТЬЬЬЬЬЬ
         [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(SongDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deletedSong = songService.Delete(id);
+            var deletedSong = await songService.DeleteAsync(id);
             playlistService.DeleteSongPlaylistsBySongId(id);
 
             return deletedSong != null ? Ok(mapper.Map<SongDto>(deletedSong)) : NotFound();
@@ -122,9 +124,9 @@ namespace db_cp.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(SongDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var song = songService.GetByID(id);
+            var song = await songService.GetByIDAsync(id);
             return song != null ? Ok(mapper.Map<SongDto>(song)) : NotFound();
         }
     }

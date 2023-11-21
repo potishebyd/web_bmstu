@@ -40,11 +40,11 @@ namespace web_bmstu.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<PlaylistDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public IActionResult GetAll(
+        public async Task<IActionResult> GetAll(
             [FromQuery] PlaylistSortState? sortState
         )
         {
-            return Ok(mapper.Map<IEnumerable<PlaylistDto>>(playlistService.GetAll(sortState)));
+            return Ok(mapper.Map<IEnumerable<PlaylistDto>>(await playlistService.GetAllAsync(sortState)));
         }
 
         [Authorize]
@@ -53,11 +53,11 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Add(PlaylistBaseDto playlistDto)
+        public async Task<IActionResult> Add(PlaylistBaseDto playlistDto)
         {
             try
             {
-                var addedPlaylist = playlistService.Add(mapper.Map<PlaylistBL>(playlistDto));
+                var addedPlaylist = await playlistService.AddAsync(mapper.Map<PlaylistBL>(playlistDto));
                 return Ok(mapper.Map<PlaylistDto>(addedPlaylist));
             }
             catch (Exception ex)
@@ -93,11 +93,11 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Patch(int id, PlaylistBaseDto playlist)
+        public async Task<IActionResult> Patch(int id, PlaylistBaseDto playlist)
         {
             try
             {
-                var updatedPlaylist = playlistService.Update(playlistConverters.convertPatch(id, playlist));
+                var updatedPlaylist = await playlistService.UpdateAsync(playlistConverters.convertPatch(id, playlist));
                 return updatedPlaylist != null ? Ok(mapper.Map<PlaylistDto>(updatedPlaylist)) : NotFound();
             }
             catch (Exception ex)
@@ -111,10 +111,10 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deletedPlaylist = playlistService.Delete(id);
-            playlistService.DeleteSongPlaylistsByPlaylistId(id);
+            var deletedPlaylist = await playlistService.DeleteAsync(id);
+            playlistService.DeleteSongPlaylistsByPlaylistIdAsync(id);
 
             return deletedPlaylist != null ? Ok(mapper.Map<PlaylistDto>(deletedPlaylist)) : NotFound();
         }
@@ -124,9 +124,9 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var playlist = playlistService.GetByID(id);
+            var playlist = await playlistService.GetByIDAsync(id);
             return playlist != null ? Ok(mapper.Map<PlaylistDto>(playlist)) : NotFound();
         }
 
@@ -134,13 +134,13 @@ namespace web_bmstu.Controllers
         [HttpGet("{playlistId}/songs")]
         [ProducesResponseType(typeof(IEnumerable<SongDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public IActionResult GetSongsByPlaylistId(
+        public async Task <IActionResult> GetSongsByPlaylistId(
             int playlistId,
             [FromQuery] SongFilterDto filter,
             [FromQuery] SongSortState? sortState
         )
         {
-            return Ok(mapper.Map<IEnumerable<SongDto>>(songService.GetSongsByPlaylistId(playlistId, filter, sortState)));
+            return Ok(mapper.Map<IEnumerable<SongDto>>(await songService.GetSongsByPlaylistIdAsync(playlistId, filter, sortState)));
         }
 
         [Authorize]
@@ -148,9 +148,9 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(SongPlaylistDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult GetSongPlaylist(int songId, int playlistId)
+        public async Task<IActionResult> GetSongPlaylist(int songId, int playlistId)
         {
-            var songPlaylist = playlistService.GetSongPlaylist(songId, playlistId);
+            var songPlaylist = await playlistService.GetSongPlaylistAsync(songId, playlistId);
             return songPlaylist != null ? Ok(mapper.Map<SongPlaylistDto>(songPlaylist)) : NotFound();
         }
 
@@ -160,11 +160,11 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult AddSongToPlaylist(SongIdDto songIdDto, int playlistId)
+        public async Task<IActionResult> AddSongToPlaylist(SongIdDto songIdDto, int playlistId)
         {
             try
             {
-                return Ok(mapper.Map<PlaylistDto>(playlistService.AddSongToMyPlaylist(songIdDto.Id, playlistId)));
+                return Ok(mapper.Map<PlaylistDto>(await playlistService.AddSongToMyPlaylistAsync(songIdDto.Id, playlistId)));
             }
             catch (Exception ex)
             {
@@ -177,11 +177,11 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(PlaylistDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult DeleteSongFromPlaylist(int songId, int playlistId)
+        public async Task<IActionResult> DeleteSongFromPlaylist(int songId, int playlistId)
         {
             try
             {
-                return Ok(mapper.Map<PlaylistDto>(playlistService.DeleteSongFromMyPlaylist(songId, playlistId)));
+                return Ok(mapper.Map<PlaylistDto>(await playlistService.DeleteSongFromMyPlaylistAsync(songId, playlistId)));
             }
             catch (Exception ex)
             {

@@ -22,7 +22,8 @@ namespace web_bmstu.ModelsConverters
                 Id = id,
                 Login = user.Login ?? existedUser.Login,
                 Password = user.Password ?? existedUser.Password,
-                Permission = user.Permission ?? existedUser.Permission
+                Permission = user.Permission ?? existedUser.Permission,
+                Email = user.Email ?? existedUser.Email
             };
         }
     }

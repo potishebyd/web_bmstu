@@ -37,17 +37,48 @@ namespace web_bmstu.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        //[HttpGet]
+        //[ProducesResponseType(typeof(IEnumerable<Artist>), StatusCodes.Status200OK)]
+        //public IActionResult GetAll(
+        //    [FromQuery] ArtistFilterDto filter,
+        //    [FromQuery] ArtistSortState? sortState
+        //)
+        //{
+        //    Console.WriteLine(filter.Name);
+        //    _logger.LogInformation("Artists (Request: GET)");
+        //    return Ok(mapper.Map<IEnumerable<ArtistDto>>(artistService.GetAll(filter, sortState)));
+        //}
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Artist>), StatusCodes.Status200OK)]
-        public IActionResult GetAll(
+        public async Task<IActionResult> GetAll(
             [FromQuery] ArtistFilterDto filter,
             [FromQuery] ArtistSortState? sortState
-        )
+)
         {
-            Console.WriteLine(filter.Name);
+            //Console.WriteLine(filter.Name);
             _logger.LogInformation("Artists (Request: GET)");
-            return Ok(mapper.Map<IEnumerable<ArtistDto>>(artistService.GetAll(filter, sortState)));
+            var artists = await artistService.GetAllAsync(filter, sortState);
+            return Ok(mapper.Map<IEnumerable<ArtistDto>>(artists));
         }
+
+        //[Authorize]
+        //[HttpPost]
+        //[ProducesResponseType(typeof(ArtistDto), StatusCodes.Status201Created)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
+        //public IActionResult Add(ArtistBaseDto artistDto)
+        //{
+        //    try
+        //    {
+        //        var addedArtist = artistService.Add(mapper.Map<ArtistBL>(artistDto));
+        //        return Ok(mapper.Map<ArtistDto>(addedArtist));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Conflict(ex.Message);
+        //    }
+        //}
 
         [Authorize]
         [HttpPost]
@@ -55,18 +86,41 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Add(ArtistBaseDto artistDto)
+        public async Task<IActionResult> Add(ArtistBaseDto artistDto)
         {
             try
             {
-                var addedArtist = artistService.Add(mapper.Map<ArtistBL>(artistDto));
-                return Ok(mapper.Map<ArtistDto>(addedArtist));
+                var artist = mapper.Map<ArtistBL>(artistDto);
+                await artistService.AddAsync(artist);
+                return Ok(artistDto);
             }
             catch (Exception ex)
             {
                 return Conflict(ex.Message);
             }
         }
+
+        //[Authorize]
+        //[HttpPut("{id}")]
+        //[ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
+        //public IActionResult Put(int id, ArtistBaseDto artist)
+        //{
+        //    try
+        //    {
+        //        var updatedArtist = artistService.Update(mapper.Map<ArtistBL>(artist,
+        //                o => o.AfterMap((src, dest) => dest.Id = id)));
+
+        //        return updatedArtist != null ? Ok(mapper.Map<ArtistDto>(updatedArtist)) : NotFound();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Conflict(ex.Message);
+        //    }
+        //}
 
         [Authorize]
         [HttpPut("{id}")]
@@ -75,12 +129,13 @@ namespace web_bmstu.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
-        public IActionResult Put(int id, ArtistBaseDto artist)
+        public async Task<IActionResult> Put(int id, ArtistBaseDto artist)
         {
             try
             {
-                var updatedArtist = artistService.Update(mapper.Map<ArtistBL>(artist,
-                        o => o.AfterMap((src, dest) => dest.Id = id)));
+                var updatedArtist = mapper.Map<ArtistBL>(artist,
+                        o => o.AfterMap((src, dest) => dest.Id = id));
+                await artistService.UpdateAsync(updatedArtist);
 
                 return updatedArtist != null ? Ok(mapper.Map<ArtistDto>(updatedArtist)) : NotFound();
             }
@@ -89,6 +144,8 @@ namespace web_bmstu.Controllers
                 return Conflict(ex.Message);
             }
         }
+
+
 
         // [HttpPatch("{id}")]
         // [ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
@@ -108,23 +165,43 @@ namespace web_bmstu.Controllers
         //     }
         // }
 
+        //[Authorize]
+        //[HttpDelete("{id}")]
+        //[ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        //public IActionResult Delete(int id)
+        //{
+        //    var deletedArtist = artistService.Delete(id);
+        //    return deletedArtist != null ? Ok(mapper.Map<ArtistDto>(deletedArtist)) : NotFound();
+        //}
+
         [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deletedArtist = artistService.Delete(id);
+            var deletedArtist = await artistService.DeleteAsync(id);
             return deletedArtist != null ? Ok(mapper.Map<ArtistDto>(deletedArtist)) : NotFound();
         }
 
+
+        //[HttpGet("{id}")]
+        //[ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        //public IActionResult GetById(int id)
+        //{
+        //    var artist = artistService.GetByID(id);
+        //    return artist != null ? Ok(mapper.Map<ArtistDto>(artist)) : NotFound();
+        //}
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var artist = artistService.GetByID(id);
+            var artist = await artistService.GetByIDAsync(id);
             return artist != null ? Ok(mapper.Map<ArtistDto>(artist)) : NotFound();
         }
     }

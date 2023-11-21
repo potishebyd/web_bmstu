@@ -28,6 +28,20 @@ namespace web_bmstu.Services
         IEnumerable<SongBL> GetByRecordingStudioName(string recordingStudioName);
         IEnumerable<SongBL> GetByArtistName(string artistName);
         IEnumerable<SongBL> GetSongsByPlaylistId(int playlistId, SongFilterDto filter, SongSortState? sortState);
+
+
+        Task<SongBL> AddAsync(SongBL song);
+        Task<SongBL> DeleteAsync(int id);
+        Task<SongBL> UpdateAsync(SongBL song);
+
+        Task<IEnumerable<SongBL>> GetAllAsync(SongFilterDto filter, SongSortState? sortState);
+        Task<SongBL> GetByIDAsync(int id);
+        Task<IEnumerable<SongBL>> GetByTitleAsync(string title);
+        Task<IEnumerable<SongBL>> GetByAlbumTitleAsync(string albumTitle);
+        Task<IEnumerable<SongBL>> GetByGenreAsync(string genre);
+        Task<IEnumerable<SongBL>> GetByRecordingStudioNameAsync(string recordingStudioName);
+        Task<IEnumerable<SongBL>> GetByArtistNameAsync(string artistName);
+        Task<IEnumerable<SongBL>> GetSongsByPlaylistIdAsync(int playlistId, SongFilterDto filter, SongSortState? sortState);
     }
 
     public class SongService : ISongService
@@ -70,9 +84,23 @@ namespace web_bmstu.Services
             return _mapper.Map<SongBL>(_songRepository.Add(_mapper.Map<Song>(song)));
         }
 
+        public async Task<SongBL> AddAsync(SongBL song)
+        {
+            if (IsExist(song))
+                throw new Exception("Такая песня уже существует");
+
+            return _mapper.Map<SongBL>(await _songRepository.AddAsync(_mapper.Map<Song>(song)));
+        }
+
         public SongBL Delete(int id)
         {
             return _mapper.Map<SongBL>(_songRepository.Delete(id));
+        }
+
+
+        public async Task<SongBL> DeleteAsync(int id)
+        {
+            return _mapper.Map<SongBL>(await _songRepository.DeleteAsync(id));
         }
         public SongBL Update(SongBL song)
         {
@@ -80,29 +108,56 @@ namespace web_bmstu.Services
                 return null;
 
             if (IsExist(song))
-                throw new Exception("Такой футболист уже существует");
+                throw new Exception("Такой песня уже существует");
 
             return _mapper.Map<SongBL>(_songRepository.Update(_mapper.Map<Song>(song)));
+        }
+
+        public async Task<SongBL> UpdateAsync(SongBL song)
+        {
+            if (IsNotExist(song.Id))
+                return null;
+
+            if (IsExist(song))
+                throw new Exception("Такой песня уже существует");
+
+            return _mapper.Map<SongBL>(await _songRepository.UpdateAsync(_mapper.Map<Song>(song)));
         }
 
         public SongBL GetByID(int id)
         {
             return _mapper.Map<SongBL>(_songRepository.GetByID(id));
         }
+        public async Task<SongBL> GetByIDAsync(int id)
+        {
+            return _mapper.Map<SongBL>(await _songRepository.GetByIDAsync(id));
+        }
         public IEnumerable<SongBL> GetByAlbumTitle(string albumTitle)
         {
             return _mapper.Map<IEnumerable<SongBL>>(_songRepository.GetByAlbumTitle(albumTitle));
         }
-
+        public async Task<IEnumerable<SongBL>> GetByAlbumTitleAsync(string albumTitle)
+        {
+            return _mapper.Map<IEnumerable<SongBL>>(await _songRepository.GetByAlbumTitleAsync(albumTitle));
+        }
         public IEnumerable<SongBL> GetByGenre(string genre)
         {
             return _mapper.Map<IEnumerable<SongBL>>(_songRepository.GetByGenre(genre));
+        }
+
+        public async  Task<IEnumerable<SongBL>> GetByGenreAsync(string genre)
+        {
+            return _mapper.Map<IEnumerable<SongBL>>(await _songRepository.GetByGenreAsync(genre));
         }
         public IEnumerable<SongBL> GetByTitle(string title)
         {
             return _mapper.Map<IEnumerable<SongBL>>(_songRepository.GetByTitle(title));
         }
 
+        public async Task<IEnumerable<SongBL>> GetByTitleAsync(string title)
+        {
+            return _mapper.Map<IEnumerable<SongBL>>(await _songRepository.GetByTitleAsync(title));
+        }
         public IEnumerable<SongBL> GetByArtistName(string artistName)
         {
             Artist artist = _artistRepository.GetByName(artistName);
@@ -114,6 +169,16 @@ namespace web_bmstu.Services
 
         }
 
+        public async Task<IEnumerable<SongBL>> GetByArtistNameAsync(string artistName)
+        {
+            Artist artist = await _artistRepository.GetByNameAsync(artistName);
+
+            if (artist == null)
+                return Enumerable.Empty<SongBL>();
+            else
+                return _mapper.Map<IEnumerable<SongBL>>((await _songRepository.GetAllAsync()).Where(elem => elem.ArtistId == artist.Id));
+
+        }
         public IEnumerable<SongBL> GetByRecordingStudioName(string recordingStudioName)
         {
             RecordingStudio recordingStudio = _recordingStudioRepository.GetByName(recordingStudioName);
@@ -125,9 +190,33 @@ namespace web_bmstu.Services
 
         }
 
+        public async Task<IEnumerable<SongBL>> GetByRecordingStudioNameAsync(string recordingStudioName)
+        {
+            RecordingStudio recordingStudio = await _recordingStudioRepository.GetByNameAsync(recordingStudioName);
+
+            if (recordingStudio == null)
+                return Enumerable.Empty<SongBL>();
+            else
+                return _mapper.Map<IEnumerable<SongBL>>((await _songRepository.GetAllAsync()).Where(elem => elem.RecordingStudioId == recordingStudio.Id));
+
+        }
         public IEnumerable<SongBL> GetAll(SongFilterDto filter, SongSortState? sortState)
         {
             var songs = _mapper.Map<IEnumerable<SongBL>>(_songRepository.GetAll());
+
+            songs = FilterSongs(songs, filter);
+
+            if (sortState != null)
+                songs = SortSongsByOption(songs, sortState.Value);
+            else
+                songs = SortSongsByOption(songs, SongSortState.IdAsc);
+
+            return songs;
+        }
+
+        public async Task<IEnumerable<SongBL>> GetAllAsync(SongFilterDto filter, SongSortState? sortState)
+        {
+            var songs = _mapper.Map<IEnumerable<SongBL>>(await _songRepository.GetAllAsync());
 
             songs = FilterSongs(songs, filter);
 
@@ -144,6 +233,17 @@ namespace web_bmstu.Services
             var songs = _mapper.Map<IEnumerable<SongBL>>(_playlistRepository.GetSongsByPlaylistId(playlistId));
 
             songs = FilterSongs(songs, filter);
+
+            if (sortState != null)
+                songs = SortSongsByOption(songs, sortState.Value);
+
+            return songs;
+        }
+        public async Task<IEnumerable<SongBL>> GetSongsByPlaylistIdAsync(int playlistId, SongFilterDto filter, SongSortState? sortState)
+        {
+            var songs = _mapper.Map<IEnumerable<SongBL>>(await _playlistRepository.GetSongsByPlaylistIdAsync(playlistId));
+
+            songs = await FilterSongsAsync(songs, filter);
 
             if (sortState != null)
                 songs = SortSongsByOption(songs, sortState.Value);
@@ -185,6 +285,42 @@ namespace web_bmstu.Services
             }
             return filteredSongs;
         }
+
+        private async Task<IEnumerable<SongBL>> FilterSongsAsync(IEnumerable<SongBL> songs, SongFilterDto filter)
+        {
+            var filteredSongs = songs;
+
+            if (!String.IsNullOrEmpty(filter.Title))
+                filteredSongs = filteredSongs.Where(elem => elem.Title.Contains(filter.Title));
+
+            if (!String.IsNullOrEmpty(filter.AlbumTitle))
+                filteredSongs = filteredSongs.Where(elem => elem.AlbumTitle.Contains(filter.AlbumTitle));
+
+            if (!String.IsNullOrEmpty(filter.Genre))
+                filteredSongs = filteredSongs.Where(elem => elem.Genre.Contains(filter.Genre));
+
+            if (!String.IsNullOrEmpty(filter.ArtistName))
+            {
+                Artist artist = await _artistRepository.GetByNameAsync(filter.ArtistName);
+
+                if (artist == null)
+                    filteredSongs = Enumerable.Empty<SongBL>();
+                else
+                    filteredSongs = filteredSongs.Where(elem => elem.ArtistId == artist.Id);
+            }
+
+            if (!String.IsNullOrEmpty(filter.RecordingStudioName))
+            {
+                RecordingStudio recordingStudio = await _recordingStudioRepository.GetByNameAsync(filter.RecordingStudioName);
+
+                if (recordingStudio == null)
+                    filteredSongs = Enumerable.Empty<SongBL>();
+                else
+                    filteredSongs = filteredSongs.Where(elem => elem.RecordingStudioId == recordingStudio.Id);
+            }
+            return filteredSongs;
+        }
+
 
         private IEnumerable<SongBL> SortSongsByOption(IEnumerable<SongBL> players, SongSortState sortOrder)
         {
