@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "o0Bi7cuF1jrVtlZtrU9OYgbr+j7WDzlPDXqAOUmNdFIgGDkGmIgxG/anyG17ovUVTAARnc3TnZ0wdFFNiOzVbQ==",
+  "dgSpecHash": "U8AH3KF4zbzOltOsZmTcg0YQNyU5BwxEsUunFgBbX5K6LdHNWrGcmgqnQUD/RwyWzIFImeTQyHJ0qX9jg4zJyw==",
   "success": true,
   "projectFilePath": "C:\\Users\\kiril\\source\\repos\\web_bmstu\\web_bmstu\\web_bmstu.csproj",
   "expectedPackageFiles": [
@@ -36,6 +36,7 @@
     "C:\\Users\\kiril\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Users\\kiril\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
     "C:\\Users\\kiril\\.nuget\\packages\\microsoft.openapi\\1.6.9\\microsoft.openapi.1.6.9.nupkg.sha512",
+    "C:\\Users\\kiril\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.4\\microsoft.visualstudio.azure.containers.tools.targets.1.19.4.nupkg.sha512",
     "C:\\Users\\kiril\\.nuget\\packages\\microsoft.visualstudio.setup.configuration.interop\\3.2.2146\\microsoft.visualstudio.setup.configuration.interop.3.2.2146.nupkg.sha512",
     "C:\\Users\\kiril\\.nuget\\packages\\microsoft.win32.systemevents\\7.0.0\\microsoft.win32.systemevents.7.0.0.nupkg.sha512",
     "C:\\Users\\kiril\\.nuget\\packages\\nodatime\\3.1.9\\nodatime.3.1.9.nupkg.sha512",
